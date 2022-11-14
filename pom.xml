@@ -12,6 +12,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <maven.compiler.source>12</maven.compiler.source>
+    <maven.compiler.target>12</maven.compiler.target>
+
   </properties>
 
   <dependencies>
@@ -24,7 +28,15 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.31</version>
+      <version>8.0.25</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.21.9</version>
     </dependency>
   </dependencies>
+
 </project>
