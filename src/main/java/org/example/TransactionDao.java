@@ -1,6 +1,8 @@
 package org.example;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionDao {
 
@@ -11,7 +13,7 @@ public class TransactionDao {
         PreparedStatement preparedStatement = null;
 
         try {
-            String sql = "INSET INTO transactions(type, description, amount, date) VALUES(?, ?, ?, ?)";
+            String sql = "INSERT INTO transactions(type, description, amount, date) VALUES(?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, transaction.getType());
             preparedStatement.setString(2, transaction.getDescription());
@@ -57,24 +59,26 @@ public class TransactionDao {
         close();
     }
 
-    public Transaction findByType(String type) {
+    public List<Transaction> findByType(String type) {
         connection = connect();
         PreparedStatement preparedStatement = null;
         try {
-            String sql = "SELECT FROM transactions WHERE type = ?";
+            String sql = "SELECT * FROM transactions WHERE type = ?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, type);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if(resultSet.next()) {
+
+            List<Transaction> transactions = new ArrayList<>();
+            while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String typeDb = resultSet.getString("type");
                 String description = resultSet.getString("description");
                 double amount = resultSet.getDouble("amount");
                 String date = resultSet.getString("date");
                 Transaction transaction = new Transaction(id, typeDb, description, amount, date);
-                return transaction;
-
+                transactions.add(transaction);
             }
+            return transactions;
         } catch (SQLException e) {
             System.out.println("Niepowodzenie podczas szukania rekordu: " + e.getMessage());
         }
@@ -91,9 +95,9 @@ public class TransactionDao {
             System.out.println("Problem ze strownikami: " + e.getMessage());
         }
 
-        String url = "jdbc:mysql://localhost:3306/transactions?serverTimezone=UTC";
+        String url = "jdbc:mysql://localhost:3306/budget?serverTimezone=UTC";
         try {
-            return DriverManager.getConnection(url, "root", " " );
+            return DriverManager.getConnection(url, "root", "");
         } catch (SQLException e) {
             System.out.println("Problem z połączeniem: " + e.getMessage());
         }

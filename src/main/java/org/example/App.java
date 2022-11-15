@@ -1,20 +1,30 @@
 package org.example;
 
+import java.util.List;
 import java.util.Scanner;
 
-/**
- * Hello world!
- *
- */
 public class App {
-    private static final TransactionDao DAO = new TransactionDao();
+
+    public static final String OPTION_INSERT = "1";
+    public static final String OPTION_UPDATE = "2";
+    public static final String OPTION_DELETE = "3";
+    public static final String OPTION_DISPLAY_INCOME = "4";
+    public static final String OPTION_DISPLAY_OUTCOM = "5";
+    public static final String EXIT = "0";
     public static final String TRANSACTION_INCOME = "przychod";
-    public static final String TRANSACTION_OUTCOME ="wydatek";
+    public static final String TRANSACTION_OUTCOME = "wydatek";
     private static Scanner scanner = new Scanner(System.in);
 
-    public static void main( String[] args ) {
+    private final TransactionDao dao = new TransactionDao();
 
-        while(true) {
+    public static void main(String[] args) {
+        
+        App app = new App();
+        app.run();
+    }
+
+    private void run() {
+        while (true) {
             System.out.println("Wybierz opcję:");
             System.out.println("1 - dodaj");
             System.out.println("2 - modyfikuj");
@@ -26,39 +36,25 @@ public class App {
             String option = scanner.nextLine();
 
             switch (option) {
-                case "1":
-                    create();
-                    break;
-                case "2":
-                    update();
-                    break;
-                case "3":
-                    deleteById();
-                    break;
-                case "4":
-                    displayIncome();
-                    break;
-                case "5":
-                    displayOutcome();
-                    break;
-                case "0":
-                    return;
-                default:
-                    System.out.println("Niepoprawny wybór");
+                case OPTION_INSERT -> create();
+                case OPTION_UPDATE -> update();
+                case OPTION_DELETE -> deleteById();
+                case OPTION_DISPLAY_INCOME -> displayIncome();
+                case OPTION_DISPLAY_OUTCOM -> displayOutcome();
+                case EXIT -> {
+                    return; }
+                default -> System.out.println("Niepoprawny wybór");
             }
         }
-
-
     }
 
-    private static void create(){
+    private void create() {
 
         String type;
-        do{
+        do {
             System.out.println("Podaj typ: wydatek, przychod");
             type = scanner.nextLine();
-        } while(!type.equals(TRANSACTION_OUTCOME) && !type.equals(TRANSACTION_INCOME));
-
+        } while (!type.equals(TRANSACTION_OUTCOME) && !type.equals(TRANSACTION_INCOME));
 
         System.out.println("Podaj opis:");
         String description = scanner.nextLine();
@@ -71,21 +67,20 @@ public class App {
         String date = scanner.nextLine();
 
         Transaction transaction = new Transaction(type, description, amount, date);
-        DAO.save(transaction);
+        dao.save(transaction);
     }
 
-    private static void update() {
+    private void update() {
 
-        System.out.println("Podaj id książki którą chcesz zaktualizować");
+        System.out.println("Podaj id transakcji, którą chcesz zaktualizować");
         int id = scanner.nextInt();
         scanner.nextLine();
 
         String type;
-        do{
+        do {
             System.out.println("Podaj typ: wydatek, przychod");
             type = scanner.nextLine();
-        } while(!type.equals(TRANSACTION_OUTCOME) && !type.equals(TRANSACTION_INCOME));
-
+        } while (!type.equals(TRANSACTION_OUTCOME) && !type.equals(TRANSACTION_INCOME));
 
         System.out.println("Podaj opis:");
         String description = scanner.nextLine();
@@ -98,21 +93,37 @@ public class App {
         String date = scanner.nextLine();
 
         Transaction transaction = new Transaction(id, type, description, amount, date);
-        DAO.update(transaction);
+        dao.update(transaction);
     }
 
-    private static void deleteById() {
+    private void deleteById() {
         System.out.println("Podaj id ");
         int id = scanner.nextInt();
-        DAO.deleteById(id);
+        dao.deleteById(id);
         System.out.println("Rekord został usunięty");
     }
 
-    private static  void displayIncome() {
-        System.out.println(DAO.findByType(TRANSACTION_INCOME));
+    private void displayIncome() {
+        List<Transaction> transactions = dao.findByType(TRANSACTION_INCOME);
+        System.out.println("Lista przychodów:" + transactions.size());
+        if (!(transactions == null || transactions.isEmpty())) {
+            for (Transaction transaction : transactions) {
+                System.out.println(transaction);
+            }
+        } else {
+            System.out.println("Brak przychodów \n");
+        }
     }
 
-    private static void displayOutcome() {
-        System.out.println(DAO.findByType(TRANSACTION_OUTCOME));
+    private void displayOutcome() {
+        List<Transaction> transactions = dao.findByType(TRANSACTION_OUTCOME);
+        System.out.println("Lista wydatków:" + transactions.size());
+        if (!(transactions == null || transactions.isEmpty())) {
+            for (Transaction transaction : transactions) {
+                System.out.println(transaction);
+            }
+        } else {
+            System.out.println("Brak wydatków \n");
+        }
     }
 }
